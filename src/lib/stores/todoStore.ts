@@ -97,7 +97,7 @@ export function createTodoStore() {
 	}
 
 	// 封裝更新待辦事項的方法。
-	function update(todo: UpdateTodo) {
+	function update(todo: Todo) {
 		get(updateTodoMutation).mutate(todo)
 	}
 
