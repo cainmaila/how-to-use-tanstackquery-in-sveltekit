@@ -1,6 +1,6 @@
 <script lang="ts">
 	// 匯入經過二次封裝的 store 工廠函數
-	import { createTodoStore } from '$lib/stores/todoStore.svelte'
+	import { createTodoStore } from '$lib/stores/todoStore'
 
 	// 注意看，現在的解構出來的都是簡單的變數和函數名，完全看不出 TanStack Query 的痕跡
 	const {

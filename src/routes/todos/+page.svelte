@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { createTodoStore } from '../../lib/stores/todoStore.svelte'
-	import type { Todo } from '../../lib/stores/todoStore.svelte'
+	import { createTodoStore } from '../../lib/stores/todoStore'
+	import type { Todo } from '../../lib/stores/todoStore'
 
 	const {
 		todos,
