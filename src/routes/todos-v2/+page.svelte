@@ -1,64 +1,68 @@
 <script lang="ts">
-	import { createTodoStore } from '$lib/stores/todoStore'
+	import { createTodoStore } from '$lib/stores/todoStore.svelte'
+	import type { Todo } from '../../lib/stores/todoStore.svelte'
 
-	const { todosQuery, addTodoMutation, updateTodoMutation, deleteTodoMutation } = createTodoStore()
+	const {
+		todos,
+		isLoading,
+		isFetching,
+		error,
+		isAdding,
+		isUpdating,
+		isRemoving,
+		add,
+		update,
+		remove
+	} = createTodoStore()
 
 	let newTodoText = $state('')
 
 	function handleAddTodo(event: Event) {
 		event.preventDefault()
 		if (newTodoText.trim()) {
-			$addTodoMutation.mutate(newTodoText)
+			add(newTodoText)
 			newTodoText = ''
 		}
 	}
 
 	function handleToggleTodo(id: number, completed: boolean) {
-		const todoToUpdate = $todosQuery.data?.find((todo) => todo.id === id)
+		const todoToUpdate = todos.find((todo: Todo) => todo.id === id)
 		if (todoToUpdate) {
-			$updateTodoMutation.mutate({ ...todoToUpdate, completed })
+			update({ ...todoToUpdate, completed })
 		}
 	}
 
 	function handleDeleteTodo(id: number) {
-		$deleteTodoMutation.mutate(id)
+		remove(id)
 	}
 </script>
 
 <div class="container">
-	<h1>
-		待辦事項列表 (v2)
-		{#if $todosQuery.isFetching && !$todosQuery.isLoading}<span class="syncing">(同步中...)</span
-			>{/if}
-	</h1>
+	<h1>待辦事項列表 (v2)</h1>
 
 	<form onsubmit={handleAddTodo} class="todo-form">
 		<input type="text" bind:value={newTodoText} placeholder="新增待辦事項" />
-		<button type="submit" disabled={$addTodoMutation.isPending}
-			>新增 {$addTodoMutation.isPending ? '中...' : ''}</button
-		>
+		<button type="submit" disabled={isAdding}>新增 {isAdding ? '中...' : ''}</button>
 	</form>
 
-	{#if $todosQuery.isLoading}
+	{#if isLoading || isFetching}
 		<p>載入中...</p>
-	{:else if $todosQuery.error}
-		<p class="error">錯誤: {$todosQuery.error.message}</p>
-	{:else if !$todosQuery.data || $todosQuery.data.length === 0}
+	{:else if error}
+		<p class="error">錯誤: {error.message}</p>
+	{:else if todos.length === 0}
 		<p>目前沒有待辦事項。</p>
 	{:else}
 		<ul class="todo-list">
-			{#each $todosQuery.data as todo (todo.id)}
+			{#each todos as todo (todo.id)}
 				<li class="todo-item">
 					<input
 						type="checkbox"
 						checked={todo.completed}
 						onchange={() => handleToggleTodo(todo.id, !todo.completed)}
-						disabled={$updateTodoMutation.isPending}
+						disabled={isUpdating}
 					/>
 					<span class:completed={todo.completed}>{todo.text}</span>
-					<button onclick={() => handleDeleteTodo(todo.id)} disabled={$deleteTodoMutation.isPending}
-						>刪除</button
-					>
+					<button onclick={() => handleDeleteTodo(todo.id)} disabled={isRemoving}>刪除</button>
 				</li>
 			{/each}
 		</ul>
@@ -80,16 +84,6 @@
 		text-align: center;
 		color: #333;
 		margin-bottom: 30px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.syncing {
-		font-size: 1rem;
-		color: #888;
-		margin-left: 10px;
-		font-weight: normal;
 	}
 
 	.todo-form {

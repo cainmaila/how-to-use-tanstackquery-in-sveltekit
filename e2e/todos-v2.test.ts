@@ -65,36 +65,26 @@ test.describe('Todos V2 Page', () => {
 	test('should load default todos from API', async ({ page }) => {
 		await page.goto('/todos-v2')
 
-		// 等待頁面載入完成
-		await expect(page.getByRole('heading', { name: '待辦事項列表 (v2)' })).toBeVisible()
+		// 等待載入完成
+		await page.waitForTimeout(3000)
 
-		// 等待 API 請求完成 - 檢查是否不再顯示載入中
-		await page.waitForFunction(
-			() => {
-				const body = document.body.textContent || ''
-				return !body.includes('載入中...')
-			},
-			{ timeout: 10000 }
-		)
-
-		// 檢查頁面內容 - 應該要有兩筆預設的 todo
-		const pageContent = await page.textContent('body')
-
-		// 驗證是否包含預設的 todo 內容
-		expect(pageContent).toContain('Learn SvelteKit')
-		expect(pageContent).toContain('Learn TanStack Query')
-
-		// 檢查 todo items（如果有的話）
+		// 檢查是否顯示預設的兩筆 todo
 		const todoItems = page.locator('.todo-item')
-		const todoCount = await todoItems.count()
+		await expect(todoItems).toHaveCount(2)
 
-		if (todoCount > 0) {
-			// 如果找到 todo items，驗證數量
-			await expect(todoItems).toHaveCount(2)
-		} else {
-			// 如果沒有找到 todo items，至少應該看到文字內容
-			console.log('No .todo-item elements found, but content should be visible in page')
-		}
+		// 驗證預設 todo 的內容
+		const firstTodo = todoItems.nth(0)
+		const secondTodo = todoItems.nth(1)
+
+		await expect(firstTodo.locator('span')).toContainText('Learn SvelteKit')
+		await expect(secondTodo.locator('span')).toContainText('Learn TanStack Query')
+
+		// 驗證兩個 todo 都是未完成狀態
+		const firstCheckbox = firstTodo.locator('input[type="checkbox"]')
+		const secondCheckbox = secondTodo.locator('input[type="checkbox"]')
+
+		await expect(firstCheckbox).not.toBeChecked()
+		await expect(secondCheckbox).not.toBeChecked()
 	})
 
 	test('should display todos or empty state', async ({ page }) => {
