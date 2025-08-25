@@ -26,7 +26,11 @@
 </script>
 
 <div class="container">
-	<h1>待辦事項列表 (v2)</h1>
+	<h1>
+		待辦事項列表 (v2)
+		{#if $todosQuery.isFetching && !$todosQuery.isLoading}<span class="syncing">(同步中...)</span
+			>{/if}
+	</h1>
 
 	<form onsubmit={handleAddTodo} class="todo-form">
 		<input type="text" bind:value={newTodoText} placeholder="新增待辦事項" />
@@ -35,7 +39,7 @@
 		>
 	</form>
 
-	{#if $todosQuery.isLoading || $todosQuery.isFetching}
+	{#if $todosQuery.isLoading}
 		<p>載入中...</p>
 	{:else if $todosQuery.error}
 		<p class="error">錯誤: {$todosQuery.error.message}</p>
@@ -76,6 +80,16 @@
 		text-align: center;
 		color: #333;
 		margin-bottom: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.syncing {
+		font-size: 1rem;
+		color: #888;
+		margin-left: 10px;
+		font-weight: normal;
 	}
 
 	.todo-form {
