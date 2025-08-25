@@ -1,27 +1,27 @@
 <script lang="ts">
-	import { createTodoStore, type Todo } from '$lib/stores/todoStore.svelte';
+	import { createTodoStore, type Todo } from '$lib/stores/todoStore.svelte'
 
-	const { todosQuery, addTodoMutation, updateTodoMutation, deleteTodoMutation } = createTodoStore();
+	const { todosQuery, addTodoMutation, updateTodoMutation, deleteTodoMutation } = createTodoStore()
 
-	let newTodoText = $state('');
+	let newTodoText = $state('')
 
 	function handleAddTodo(event: Event) {
-		event.preventDefault();
+		event.preventDefault()
 		if (newTodoText.trim()) {
-			$addTodoMutation.mutate(newTodoText);
-			newTodoText = '';
+			$addTodoMutation.mutate(newTodoText)
+			newTodoText = ''
 		}
 	}
 
 	function handleToggleTodo(id: number, completed: boolean) {
-		const todoToUpdate = $todosQuery.data?.find((todo) => todo.id === id);
+		const todoToUpdate = $todosQuery.data?.find((todo) => todo.id === id)
 		if (todoToUpdate) {
-			$updateTodoMutation.mutate({ ...todoToUpdate, completed });
+			$updateTodoMutation.mutate({ ...todoToUpdate, completed })
 		}
 	}
 
 	function handleDeleteTodo(id: number) {
-		$deleteTodoMutation.mutate(id);
+		$deleteTodoMutation.mutate(id)
 	}
 </script>
 
@@ -30,7 +30,9 @@
 
 	<form onsubmit={handleAddTodo} class="todo-form">
 		<input type="text" bind:value={newTodoText} placeholder="新增待辦事項" />
-		<button type="submit" disabled={$addTodoMutation.isPending}>新增 {$addTodoMutation.isPending ? '中...' : ''}</button>
+		<button type="submit" disabled={$addTodoMutation.isPending}
+			>新增 {$addTodoMutation.isPending ? '中...' : ''}</button
+		>
 	</form>
 
 	{#if $todosQuery.isLoading || $todosQuery.isFetching}
@@ -50,7 +52,9 @@
 						disabled={$updateTodoMutation.isPending}
 					/>
 					<span class:completed={todo.completed}>{todo.text}</span>
-					<button onclick={() => handleDeleteTodo(todo.id)} disabled={$deleteTodoMutation.isPending}>刪除</button>
+					<button onclick={() => handleDeleteTodo(todo.id)} disabled={$deleteTodoMutation.isPending}
+						>刪除</button
+					>
 				</li>
 			{/each}
 		</ul>

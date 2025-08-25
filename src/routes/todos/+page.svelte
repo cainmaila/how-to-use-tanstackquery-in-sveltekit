@@ -1,53 +1,59 @@
 <script lang="ts">
-	import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query';
-	import { browser } from '$app/environment';
-	import { fetchTodos, addTodoApi, updateTodoApi, deleteTodoApi, type Todo } from '$lib/stores/todoStore.svelte';
+	import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query'
+	import { browser } from '$app/environment'
+	import {
+		fetchTodos,
+		addTodoApi,
+		updateTodoApi,
+		deleteTodoApi,
+		type Todo
+	} from '$lib/stores/todoStore.svelte'
 
-	const queryClient = useQueryClient();
+	const queryClient = useQueryClient()
 
 	// We only want to run queries on the client
 	const todosQuery = createQuery({
 		queryKey: ['todos'],
 		queryFn: fetchTodos,
 		enabled: browser
-	});
+	})
 
 	const addTodoMutation = createMutation({
 		mutationFn: addTodoApi,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['todos'] });
+			queryClient.invalidateQueries({ queryKey: ['todos'] })
 		}
-	});
+	})
 
 	const updateTodoMutation = createMutation({
 		mutationFn: updateTodoApi,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['todos'] });
+			queryClient.invalidateQueries({ queryKey: ['todos'] })
 		}
-	});
+	})
 
 	const deleteTodoMutation = createMutation({
 		mutationFn: deleteTodoApi,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['todos'] });
+			queryClient.invalidateQueries({ queryKey: ['todos'] })
 		}
-	});
+	})
 
-	let newTodoText = $state('');
+	let newTodoText = $state('')
 
 	function addTodo(event: SubmitEvent) {
-		event.preventDefault();
-		if (!newTodoText.trim()) return;
-		$addTodoMutation.mutate(newTodoText);
-		newTodoText = '';
+		event.preventDefault()
+		if (!newTodoText.trim()) return
+		$addTodoMutation.mutate(newTodoText)
+		newTodoText = ''
 	}
 
 	function toggleTodo(todo: Todo) {
-		$updateTodoMutation.mutate({ ...todo, completed: !todo.completed });
+		$updateTodoMutation.mutate({ ...todo, completed: !todo.completed })
 	}
 
 	function deleteTodo(id: number) {
-		$deleteTodoMutation.mutate(id);
+		$deleteTodoMutation.mutate(id)
 	}
 </script>
 
@@ -56,7 +62,9 @@
 
 	<form onsubmit={addTodo} class="todo-form">
 		<input type="text" bind:value={newTodoText} placeholder="新增待辦事項" />
-		<button type="submit" disabled={$addTodoMutation.isPending}>新增 {$addTodoMutation.isPending ? '中...' : ''}</button>
+		<button type="submit" disabled={$addTodoMutation.isPending}
+			>新增 {$addTodoMutation.isPending ? '中...' : ''}</button
+		>
 	</form>
 
 	{#if $todosQuery.isLoading || $todosQuery.isFetching}
@@ -76,7 +84,9 @@
 						disabled={$updateTodoMutation.isPending}
 					/>
 					<span class:completed={todo.completed}>{todo.text}</span>
-					<button onclick={() => deleteTodo(todo.id)} disabled={$deleteTodoMutation.isPending}>刪除</button>
+					<button onclick={() => deleteTodo(todo.id)} disabled={$deleteTodoMutation.isPending}
+						>刪除</button
+					>
 				</li>
 			{/each}
 		</ul>
@@ -145,7 +155,7 @@
 		padding: 10px 0;
 		border-bottom: 1px solid #eee;
 	}
-	
+
 	.todo-item:last-child {
 		border-bottom: none;
 	}
