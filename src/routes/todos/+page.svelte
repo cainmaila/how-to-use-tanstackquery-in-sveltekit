@@ -1,8 +1,5 @@
 <script lang="ts">
-	// 匯入 TanStack Svelte Query 的核心功能
 	import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query'
-	// 匯入 SvelteKit 的環境變數，用於判斷程式碼執行環境 (瀏覽器或伺服器)
-	import { browser } from '$app/environment'
 	// 匯入 API 請求函式
 	import { fetchTodos, addTodoApi, updateTodoApi, deleteTodoApi } from '$lib/sdk'
 
@@ -15,10 +12,7 @@
 		// 'queryKey' 是此查詢的唯一標識符，用於快取和後續操作
 		queryKey: ['todos'],
 		// 'queryFn' 是執行實際資料獲取的函式，它必須回傳一個 Promise
-		queryFn: fetchTodos,
-		// 'enabled' 選項讓我們可以控制查詢是否自動執行。
-		// 在 SvelteKit 中，我們只希望在瀏覽器環境中執行客戶端查詢
-		enabled: browser
+		queryFn: fetchTodos
 	})
 
 	// 建立一個變異 (Mutation) 來新增待辦事項
