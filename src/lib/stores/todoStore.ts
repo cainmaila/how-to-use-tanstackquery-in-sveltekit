@@ -14,7 +14,7 @@ import { fetchTodos, addTodoApi, updateTodoApi, deleteTodoApi } from '$lib/sdk'
  * 封裝在一個單一的、可重複使用的介面中。
  *
  * 透過這種方式，UI 元件不需要直接與 TanStack Query 的 `createQuery` 或 `createMutation` 互動，
- * 也不需要處理 `$` 前綴來訂閱 store。它只會使用這個 store 提供的簡潔屬性（如 `todos`, `isLoading`）
+ * 也不需要處理 ` 前綴來訂閱 store。它只會使用這個 store 提供的簡潔屬性（如 `todos`, `isLoading`）
  * 和方法（如 `add`, `update`, `remove`）。
  *
  * 這大大提升了程式碼的可讀性、可維護性和可測試性，並使得未來更換底層資料庫或狀態管理庫變得更加容易。
@@ -64,24 +64,24 @@ export function createTodoStore() {
 	// `derived` 函數接收一個或多個 store 作為輸入，並返回一個新的 store。
 	// 當輸入 store 的值變化時，`derived` store 的值也會自動更新。
 
-	// 衍生出 `todos` store，包含實際的待辦事項資料。如果資料為空，則返回空陣列。
-	const todos = derived(todosQuery, ($todosQuery) => $todosQuery.data ?? [])
-	// 衍生出 `isLoading` store，表示查詢是否正在進行初次載入。
-	const isLoading = derived(todosQuery, ($todosQuery) => $todosQuery.isLoading)
-	// 衍生出 `isFetching` store，表示查詢是否正在背景重新獲取資料（例如，在資料過期後）。
-	const isFetching = derived(todosQuery, ($todosQuery) => $todosQuery.isFetching)
-	// 衍生出 `error` store，包含查詢或變異過程中發生的錯誤資訊。
-	const error = derived(todosQuery, ($todosQuery) => $todosQuery.error)
+	// 衍生出 `todos store，包含實際的待辦事項資料。如果資料為空，則返回空陣列。
+	const todos$ = derived(todosQuery, ($todosQuery) => $todosQuery.data ?? [])
+	// 衍生出 `isLoading store，表示查詢是否正在進行初次載入。
+	const isLoading$ = derived(todosQuery, ($todosQuery) => $todosQuery.isLoading)
+	// 衍生出 `isFetching store，表示查詢是否正在背景重新獲取資料（例如，在資料過期後）。
+	const isFetching$ = derived(todosQuery, ($todosQuery) => $todosQuery.isFetching)
+	// 衍生出 `error store，包含查詢或變異過程中發生的錯誤資訊。
+	const error$ = derived(todosQuery, ($todosQuery) => $todosQuery.error)
 
-	// 衍生出 `isAdding` store，表示新增待辦事項的變異是否正在進行中。
-	const isAdding = derived(addTodoMutation, ($addTodoMutation) => $addTodoMutation.isPending)
-	// 衍生出 `isUpdating` store，表示更新待辦事項的變異是否正在進行中。
-	const isUpdating = derived(
+	// 衍生出 `isAdding store，表示新增待辦事項的變異是否正在進行中。
+	const isAdding$ = derived(addTodoMutation, ($addTodoMutation) => $addTodoMutation.isPending)
+	// 衍生出 `isUpdating store，表示更新待辦事項的變異是否正在進行中。
+	const isUpdating$ = derived(
 		updateTodoMutation,
 		($updateTodoMutation) => $updateTodoMutation.isPending
 	)
-	// 衍生出 `isDeleting` store，表示刪除待辦事項的變異是否正在進行中。
-	const isDeleting = derived(
+	// 衍生出 `isDeleting store，表示刪除待辦事項的變異是否正在進行中。
+	const isDeleting$ = derived(
 		deleteTodoMutation,
 		($deleteTodoMutation) => $deleteTodoMutation.isPending
 	)
@@ -108,16 +108,16 @@ export function createTodoStore() {
 
 	// --- 返回簡潔 API ---
 	// 將所有衍生出的 store 和封裝好的操作方法作為一個物件返回。
-	// UI 元件只需要解構這個物件，並使用 `$` 前綴來訂閱 store，或直接呼叫方法。
+	// UI 元件只需要解構這個物件，並使用 ` 前綴來訂閱 store，或直接呼叫方法。
 	// 這樣，UI 元件就完全不需要了解底層的 TanStack Query 實現細節。
 	return {
-		todos,
-		isLoading,
-		isFetching,
-		error,
-		isAdding,
-		isUpdating,
-		isDeleting,
+		todos$,
+		isLoading$,
+		isFetching$,
+		error$,
+		isAdding$,
+		isUpdating$,
+		isDeleting$,
 		add,
 		update,
 		remove

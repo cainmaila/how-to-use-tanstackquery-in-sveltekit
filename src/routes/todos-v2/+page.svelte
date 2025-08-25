@@ -4,13 +4,13 @@
 
 	// 注意看，現在的解構出來的都是簡單的變數和函數名，完全看不出 TanStack Query 的痕跡
 	const {
-		todos,
-		isLoading,
-		isFetching,
-		error,
-		isAdding,
-		isUpdating,
-		isDeleting,
+		todos$,
+		isLoading$,
+		isFetching$,
+		error$,
+		isAdding$,
+		isUpdating$,
+		isDeleting$,
 		add,
 		update,
 		remove
@@ -44,32 +44,32 @@
 <div class="container">
 	<h1>
 		待辦事項列表 (v2)
-		{#if $isFetching && !$isLoading}<span class="syncing">(同步中...)</span>{/if}
+		{#if $isFetching$ && !$isLoading$}<span class="syncing">(同步中...)</span>{/if}
 	</h1>
 
 	<form onsubmit={handleAddTodo} class="todo-form">
 		<input type="text" bind:value={newTodoText} placeholder="新增待辦事項" />
-		<button type="submit" disabled={$isAdding}>新增 {$isAdding ? '中...' : ''}</button>
+		<button type="submit" disabled={$isAdding$}>新增 {$isAdding$ ? '中...' : ''}</button>
 	</form>
 
-	{#if $isLoading}
+	{#if $isLoading$}
 		<p>載入中...</p>
-	{:else if $error}
-		<p class="error">錯誤: {$error.message}</p>
-	{:else if !$todos || $todos.length === 0}
+	{:else if $error$}
+		<p class="error">錯誤: {$error$.message}</p>
+	{:else if !$todos$ || $todos$.length === 0}
 		<p>目前沒有待辦事項。</p>
 	{:else}
 		<ul class="todo-list">
-			{#each $todos as todo (todo.id)}
+			{#each $todos$ as todo (todo.id)}
 				<li class="todo-item">
 					<input
 						type="checkbox"
 						checked={todo.completed}
 						onchange={() => handleToggleTodo(todo)}
-						disabled={$isUpdating}
+						disabled={$isUpdating$}
 					/>
 					<span class:completed={todo.completed}>{todo.text}</span>
-					<button onclick={() => handleDeleteTodo(todo.id)} disabled={$isDeleting}>刪除</button>
+					<button onclick={() => handleDeleteTodo(todo.id)} disabled={$isDeleting$}>刪除</button>
 				</li>
 			{/each}
 		</ul>
