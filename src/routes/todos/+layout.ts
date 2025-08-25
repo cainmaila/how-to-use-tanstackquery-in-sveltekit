@@ -4,14 +4,14 @@ import { getQueryClient } from '$lib/queryClient'
 // 匯入 dehydrate，這是 TanStack Query 的一個關鍵功能，用於將查詢快取序列化（脫水），
 // 以便可以將其從伺服器傳遞到客戶端。
 import { dehydrate } from '@tanstack/svelte-query'
-// 匯入我們定義的 API 請求函數。
-import { fetchTodos } from '$lib/sdk'
 // 匯入 SvelteKit 的 LayoutLoad 型別，為我們的 load 函數提供型別安全。
 import type { LayoutLoad } from './$types'
 
 // SvelteKit 的 load 函數，它會在伺服器端（首次訪問時）或客戶端（後續導航時）執行。
 // 我們將其定義為 async 函數，因為我們需要在其中執行非同步操作。
-export const load: LayoutLoad = async () => {
+// 我們從參數中解構出 fetch，這是 SvelteKit 提供的特殊 fetch 實例。
+// 在伺服器端，它能直接請求 API 端點而無需發起 HTTP 呼叫；在客戶端，它就是標準的瀏覽器 fetch。
+export const load: LayoutLoad = async ({ fetch }) => {
 	// 獲取 QueryClient 的實例。
 	const queryClient = getQueryClient()
 
@@ -22,7 +22,14 @@ export const load: LayoutLoad = async () => {
 		// queryKey 是此查詢的唯一標識符。客戶端的 useQuery 將使用相同的 key 來從快取中讀取資料。
 		queryKey: ['todos'],
 		// queryFn 是執行實際資料獲取的函數。
-		queryFn: fetchTodos
+		// 這裡我們使用從 load 函數傳入的 fetch 來請求我們的 API 端點。
+		queryFn: async () => {
+			const response = await fetch('/api/todos')
+			if (!response.ok) {
+				throw new Error('Failed to fetch todos')
+			}
+			return response.json()
+		}
 	})
 
 	// load 函數返回一個物件，其內容將作為 `data` prop 傳遞給對應的 +layout.svelte 和 +page.svelte 元件。
