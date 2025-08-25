@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { createTodoStore, type Todo } from '$lib/stores/todoStore.svelte'
+	import { createTodoStore } from '$lib/stores/todoStore.svelte'
+	import type { Todo } from '$lib/types' // <--- CHANGED
 
 	const { todosQuery, addTodoMutation, updateTodoMutation, deleteTodoMutation } = createTodoStore()
 

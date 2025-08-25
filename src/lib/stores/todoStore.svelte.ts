@@ -1,13 +1,7 @@
 // src/lib/stores/todoStore.svelte.ts
 import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query'
 import { browser } from '$app/environment'
-
-// Define the Todo interface (export it so it can be imported elsewhere)
-export interface Todo {
-	id: number
-	text: string
-	completed: boolean
-}
+import type { Todo } from '$lib/types' // <--- CHANGED
 
 // API functions
 export const fetchTodos = async (): Promise<Todo[]> => {

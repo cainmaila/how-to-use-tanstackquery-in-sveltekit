@@ -1,13 +1,57 @@
 <script lang="ts">
 	import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query'
 	import { browser } from '$app/environment'
-	import {
-		fetchTodos,
-		addTodoApi,
-		updateTodoApi,
-		deleteTodoApi,
-		type Todo
-	} from '$lib/stores/todoStore.svelte'
+	import type { Todo } from '$lib/types' // <--- CHANGED
+
+	// API functions are now local to this component
+	const fetchTodos = async (): Promise<Todo[]> => {
+		const res = await fetch('/api/todos')
+		if (!res.ok) {
+			throw new Error('Failed to fetch todos')
+		}
+		return res.json()
+	}
+
+	const addTodoApi = async (text: string): Promise<Todo> => {
+		const res = await fetch('/api/todos', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ text })
+		})
+		if (!res.ok) {
+			throw new Error('Failed to add todo')
+		}
+		return res.json()
+	}
+
+	const updateTodoApi = async (todo: Todo): Promise<Todo> => {
+		const res = await fetch(`/api/todos`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(todo)
+		})
+		if (!res.ok) {
+			throw new Error('Failed to update todo')
+		}
+		return res.json()
+	}
+
+	const deleteTodoApi = async (id: number): Promise<void> => {
+		const res = await fetch(`/api/todos`, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ id })
+		})
+		if (!res.ok) {
+			throw new Error('Failed to delete todo')
+		}
+	}
 
 	const queryClient = useQueryClient()
 
@@ -58,7 +102,11 @@
 </script>
 
 <div class="container">
-	<h1>待辦事項列表</h1>
+	<h1>
+		待辦事項列表 {#if $todosQuery.isFetching && !$todosQuery.isLoading}<span class="syncing"
+				>(同步中...)</span
+			>{/if}
+	</h1>
 
 	<form onsubmit={addTodo} class="todo-form">
 		<input type="text" bind:value={newTodoText} placeholder="新增待辦事項" />
@@ -67,7 +115,7 @@
 		>
 	</form>
 
-	{#if $todosQuery.isLoading || $todosQuery.isFetching}
+	{#if $todosQuery.isLoading}
 		<p>載入中...</p>
 	{:else if $todosQuery.error}
 		<p class="error">錯誤: {$todosQuery.error.message}</p>
@@ -108,6 +156,16 @@
 		text-align: center;
 		color: #333;
 		margin-bottom: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.syncing {
+		font-size: 1rem;
+		color: #888;
+		margin-left: 10px;
+		font-weight: normal;
 	}
 
 	.todo-form {
