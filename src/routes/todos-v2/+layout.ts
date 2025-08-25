@@ -1,6 +1,6 @@
 import { getQueryClient } from '$lib/queryClient'
 import { dehydrate } from '@tanstack/svelte-query'
-import { fetchTodos } from '$lib/stores/todoStore.svelte'
+import { fetchTodos } from '$lib/sdk'
 import type { LayoutLoad } from './$types'
 
 export const load: LayoutLoad = async () => {
