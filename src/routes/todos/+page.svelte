@@ -1,78 +1,118 @@
 <script lang="ts">
+	// 匯入 TanStack Svelte Query 的核心功能
 	import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query'
+	// 匯入 SvelteKit 的環境變數，用於判斷程式碼執行環境 (瀏覽器或伺服器)
 	import { browser } from '$app/environment'
+	// 匯入 Todo 型別定義
 	import type { Todo } from '$lib/types'
-	import { fetchTodos, addTodoApi, updateTodoApi, deleteTodoApi } from '$lib/sdk' // <--- CHANGED
+	// 匯入 API 請求函式
+	import { fetchTodos, addTodoApi, updateTodoApi, deleteTodoApi } from '$lib/sdk'
 
+	// 取得 QueryClient 的實例，用於後續的快取操作
 	const queryClient = useQueryClient()
 
-	// We only want to run queries on the client
+	// 建立一個查詢 (Query) 來取得待辦事項列表
+	// 這是一個響應式物件，其狀態會自動更新
 	const todosQuery = createQuery({
+		// 'queryKey' 是此查詢的唯一標識符，用於快取和後續操作
 		queryKey: ['todos'],
+		// 'queryFn' 是執行實際資料獲取的函式，它必須回傳一個 Promise
 		queryFn: fetchTodos,
+		// 'enabled' 選項讓我們可以控制查詢是否自動執行。
+		// 在 SvelteKit 中，我們只希望在瀏覽器環境中執行客戶端查詢
 		enabled: browser
 	})
 
+	// 建立一個變異 (Mutation) 來新增待辦事項
 	const addTodoMutation = createMutation({
+		// 'mutationFn' 是執行實際變異操作的函式
 		mutationFn: addTodoApi,
+		// 'onSuccess' 是變異成功後的回呼函式
 		onSuccess: () => {
+			// 當新增成功後，我們讓 'todos' 查詢失效
+			// 這會觸發 TanStack Query 自動重新獲取最新的待辦事項列表
 			queryClient.invalidateQueries({ queryKey: ['todos'] })
 		}
 	})
 
+	// 建立一個變異來更新待辦事項
 	const updateTodoMutation = createMutation({
 		mutationFn: updateTodoApi,
 		onSuccess: () => {
+			// 同樣地，更新成功後也讓 'todos' 查詢失效
 			queryClient.invalidateQueries({ queryKey: ['todos'] })
 		}
 	})
 
+	// 建立一個變異來刪除待辦事項
 	const deleteTodoMutation = createMutation({
 		mutationFn: deleteTodoApi,
 		onSuccess: () => {
+			// 刪除成功後也讓 'todos' 查詢失效
 			queryClient.invalidateQueries({ queryKey: ['todos'] })
 		}
 	})
 
+	// 使用 Svelte 5 的 $state 來管理新待辦事項的輸入文字
 	let newTodoText = $state('')
 
+	// 新增待辦事項的表單提交處理函式
 	function addTodo(event: SubmitEvent) {
-		event.preventDefault()
-		if (!newTodoText.trim()) return
+		event.preventDefault() // 防止表單預設的提交行為
+		if (!newTodoText.trim()) return // 如果輸入為空，則不執行任何操作
+		// 執行新增變異，並傳入新的待辦事項文字
 		$addTodoMutation.mutate(newTodoText)
-		newTodoText = ''
+		newTodoText = '' // 清空輸入框
 	}
 
+	// 切換待辦事項的完成狀態
 	function toggleTodo(todo: Todo) {
+		// 執行更新變異，傳入一個新的 todo 物件，其中 'completed' 狀態被反轉
 		$updateTodoMutation.mutate({ ...todo, completed: !todo.completed })
 	}
 
+	// 刪除待辦事項
 	function deleteTodo(id: number) {
+		// 執行刪除變異，並傳入要刪除的 todo 的 id
 		$deleteTodoMutation.mutate(id)
 	}
 </script>
 
+<!-- Svelte 的模板語法 -->
 <div class="container">
 	<h1>
-		待辦事項列表 {#if $todosQuery.isFetching && !$todosQuery.isLoading}<span class="syncing"
-				>(同步中...)</span
-			>{/if}
+		待辦事項列表
+		{#if $todosQuery.isFetching && !$todosQuery.isLoading}
+			<!-- 
+        $todosQuery.isFetching: 表示正在背景重新獲取資料 (例如，因為 invalidateQueries)
+        $todosQuery.isLoading: 表示正在進行初次載入
+        這個 span 會在背景同步資料時顯示
+      -->
+			<span class="syncing">(同步中...)</span>
+		{/if}
 	</h1>
 
+	<!-- 新增待辦事項的表單 -->
 	<form onsubmit={addTodo} class="todo-form">
 		<input type="text" bind:value={newTodoText} placeholder="新增待辦事項" />
-		<button type="submit" disabled={$addTodoMutation.isPending}
-			>新增 {$addTodoMutation.isPending ? '中...' : ''}</button
-		>
+		<button type="submit" disabled={$addTodoMutation.isPending}>
+			<!-- $addTodoMutation.isPending: 表示新增操作正在進行中 -->
+			新增 {$addTodoMutation.isPending ? '中...' : ''}
+		</button>
 	</form>
 
+	<!-- 根據查詢狀態顯示不同的 UI -->
 	{#if $todosQuery.isLoading}
+		<!-- 正在初次載入時顯示 -->
 		<p>載入中...</p>
 	{:else if $todosQuery.error}
+		<!-- 發生錯誤時顯示錯誤訊息 -->
 		<p class="error">錯誤: {$todosQuery.error.message}</p>
 	{:else if !$todosQuery.data || $todosQuery.data.length === 0}
+		<!-- 沒有資料時顯示 -->
 		<p>目前沒有待辦事項。</p>
 	{:else}
+		<!-- 成功獲取資料後，顯示待辦事項列表 -->
 		<ul class="todo-list">
 			{#each $todosQuery.data as todo (todo.id)}
 				<li class="todo-item">
@@ -83,9 +123,9 @@
 						disabled={$updateTodoMutation.isPending}
 					/>
 					<span class:completed={todo.completed}>{todo.text}</span>
-					<button onclick={() => deleteTodo(todo.id)} disabled={$deleteTodoMutation.isPending}
-						>刪除</button
-					>
+					<button onclick={() => deleteTodo(todo.id)} disabled={$deleteTodoMutation.isPending}>
+						刪除
+					</button>
 				</li>
 			{/each}
 		</ul>
