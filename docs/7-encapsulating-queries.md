@@ -145,7 +145,7 @@ export function createTodoStore() {
 
 ### `src/routes/todos-v2/+page.svelte`
 
-````svelte
+```html
 <script lang="ts">
 	import { createTodoStore } from '$lib/stores/todoStore'
 	import { nanoid } from 'nanoid' // Note: nanoid needs to be installed: pnpm add nanoid
@@ -192,50 +192,53 @@ export function createTodoStore() {
 	<h1>Todo List (v2 - Encapsulated)</h1>
 
 	{#if isLoadingTodos}
-		<p>Loading todos...</p>
+	<p>Loading todos...</p>
 	{:else if todosError}
-		<p class="error">Error: {todosError.message}</p>
+	<p class="error">Error: {todosError.message}</p>
 	{:else}
-		<form onsubmit|preventDefault={handleAddTodo}>
-			<input type="text" bind:value={newTodoText} placeholder="Add a new todo" />
-			<button type="submit" disabled={isAddingTodo}>
-				{#if isAddingTodo}Adding...{:else}Add Todo{/if}
+	<form onsubmit|preventDefault="{handleAddTodo}">
+		<input type="text" bind:value="{newTodoText}" placeholder="Add a new todo" />
+		<button type="submit" disabled="{isAddingTodo}">
+			{#if isAddingTodo}Adding...{:else}Add Todo{/if}
+		</button>
+	</form>
+
+	{#if isFetchingTodos}
+	<p class="fetching-indicator">Fetching updates...</p>
+	{/if}
+
+	<ul>
+		{#each todos as todo (todo.id)}
+		<li>
+			<input type="checkbox" checked="{todo.completed}" onchange="{()" ="" />
+			handleToggleTodo(todo.id, !todo.completed)} disabled={isUpdatingTodo} />
+			<span class:completed="{todo.completed}">{todo.text}</span>
+			<button onclick="{()" ="">
+				handleDeleteTodo(todo.id)} disabled={isDeletingTodo}> {#if
+				isDeletingTodo}Deleting...{:else}Delete{/if}
 			</button>
-		</form>
-
-		{#if isFetchingTodos}
-			<p class="fetching-indicator">Fetching updates...</p>
-		{/if}
-
-		<ul>
-			{#each todos as todo (todo.id)}
-				<li>
-					<input
-						type="checkbox"
-						checked={todo.completed}
-						onchange={() => handleToggleTodo(todo.id, !todo.completed)}
-						disabled={isUpdatingTodo}
-					/>
-					<span class:completed={todo.completed}>{todo.text}</span>
-					<button onclick={() => handleDeleteTodo(todo.id)} disabled={isDeletingTodo}>
-						{#if isDeletingTodo}Deleting...{:else}Delete{/if}
-					</button>
-				</li>
-			{/each}
-		</ul>
+		</li>
+		{/each}
+	</ul>
 	{/if}
 </div>
+```
 
 ## 總結 通過這種封裝模式，我們將 TanStack Query 的複雜性隱藏在 `todoStore` 內部，使 `+page.svelte`
+
 組件只專注於 UI 渲染和使用者互動。這大大提高了程式碼的清晰度、可維護性和可重用性。 ##
 `createTodoStore` 封裝模式詳解 `src/lib/stores/todoStore.ts` 中的 `createTodoStore`
 是一個高階工廠函數，旨在將 UI 元件與 TanStack Query
 完全解耦。它將所有與待辦事項相關的資料操作邏輯（查詢、新增、更新、刪除）封裝在一個單一的、可重複使用的介面中。
+
 ### 核心思想 透過這種方式，UI 元件不需要直接與 TanStack Query 的 `createQuery` 或 `createMutation`
+
 互動，也不需要處理 `$` 前綴來訂閱 TanStack Query 自己的 store。它只會使用 `createTodoStore`
 返回的簡潔屬性（如 `todos$`, `isLoading$`）和方法（如 `add`, `update`, `remove`）。
 這大大提升了程式碼的可讀性、可維護性和可測試性，並使得未來更換底層資料庫或狀態管理庫變得更加容易。
+
 ### 實作細節 #### 1. 內部 TanStack Query 核心邏輯 這部分是實際與 TanStack Query
+
 互動的部分，它們返回的是 TanStack Query 自己的 store。 - **`todosQuery`**: 使用 `createQuery`
 建立一個查詢來獲取待辦事項列表。`queryKey` 是此查詢的唯一標識符，用於快取和失效。`queryFn`
 是執行實際資料獲取的異步函數。 - **`addTodoMutation`, `updateTodoMutation`, `deleteTodoMutation`**:
@@ -254,6 +257,7 @@ export function createTodoStore() {
 封裝更新待辦事項的方法。 - **`remove(id: number)`**: 封裝刪除待辦事項的方法。 #### 4. 返回簡潔 API
 將所有衍生出的 Svelte store 和封裝好的操作方法作為一個物件返回。UI 元件只需要解構這個物件，並使用
 `$` 前綴來訂閱 store，或直接呼叫方法。這樣，UI 元件就完全不需要了解底層的 TanStack Query 實現細節。
+
 ```typescript return {(todos$,
 isLoading$,
 isFetching$,
@@ -359,7 +363,7 @@ remove)}
 		margin-bottom: 10px;
 	}
 </style>
-````
+```
 
 ### 總結
 
