@@ -1,7 +1,6 @@
 // src/lib/stores/todoStore.svelte.ts
 import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query'
 import { browser } from '$app/environment'
-import type { Todo } from '$lib/types'
 import { fetchTodos, addTodoApi, updateTodoApi, deleteTodoApi } from '$lib/sdk' // <--- CHANGED
 
 // This function returns the raw TanStack Query stores.

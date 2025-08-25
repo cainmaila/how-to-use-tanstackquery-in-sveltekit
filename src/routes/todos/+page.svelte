@@ -3,8 +3,6 @@
 	import { createQuery, createMutation, useQueryClient } from '@tanstack/svelte-query'
 	// 匯入 SvelteKit 的環境變數，用於判斷程式碼執行環境 (瀏覽器或伺服器)
 	import { browser } from '$app/environment'
-	// 匯入 Todo 型別定義
-	import type { Todo } from '$lib/types'
 	// 匯入 API 請求函式
 	import { fetchTodos, addTodoApi, updateTodoApi, deleteTodoApi } from '$lib/sdk'
 
@@ -83,7 +81,7 @@
 	<h1>
 		待辦事項列表
 		{#if $todosQuery.isFetching && !$todosQuery.isLoading}
-			<!-- 
+			<!--
         $todosQuery.isFetching: 表示正在背景重新獲取資料 (例如，因為 invalidateQueries)
         $todosQuery.isLoading: 表示正在進行初次載入
         這個 span 會在背景同步資料時顯示

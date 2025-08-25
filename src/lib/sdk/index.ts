@@ -1,5 +1,4 @@
 // src/lib/sdk/index.ts
-import type { Todo } from '$lib/types'
 
 /**
  * 從 API 獲取所有待辦事項。
