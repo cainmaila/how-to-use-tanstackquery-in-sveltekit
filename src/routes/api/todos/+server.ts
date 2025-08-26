@@ -13,9 +13,18 @@ const todos: Todo[] = [
 	{ id: 2, text: 'Learn TanStack Query', completed: false }
 ]
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ url }) => {
 	// Added async
 	await new Promise((resolve) => setTimeout(resolve, 1000)) // Added delay
+
+	const status = url.searchParams.get('status')
+
+	if (status && status !== 'all') {
+		const completed = status === 'completed'
+		const filteredTodos = todos.filter((todo) => todo.completed === completed)
+		return json(filteredTodos)
+	}
+
 	return json(todos)
 }
 
