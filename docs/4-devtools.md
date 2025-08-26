@@ -9,18 +9,17 @@ TanStack Query 提供了強大的開發者工具，可以幫助我們監控和�
 ```svelte
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
-	import { getQueryClient } from '$lib/queryClient';
-	import { hydrate, QueryClientProvider } from '@tanstack/svelte-query';
-	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
-	import { browser } from '$app/environment';
-	import type { LayoutData } = './$types';
+	import favicon from '$lib/assets/favicon.svg'
+	import { getQueryClient } from '$lib/queryClient'
+	import { hydrate, QueryClientProvider } from '@tanstack/svelte-query'
+	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools'
+	import { browser } from '$app/environment'
+	import type { LayoutData } from './$types'
 
-	const { data, children } = $props<{ data: LayoutData; children: any }>();
+	const { data, children } = $props<{ data: LayoutData; children: any }>()
 
-	const queryClient = getQueryClient();
-	hydrate(queryClient, data.dehydratedState);
-
+	const queryClient = getQueryClient()
+	hydrate(queryClient, data.dehydratedState)
 </script>
 
 <svelte:head>
