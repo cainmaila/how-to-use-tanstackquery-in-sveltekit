@@ -9,7 +9,7 @@ interface Todo {
 }
 
 const todos: Todo[] = [
-	{ id: 1, text: 'Learn SvelteKit', completed: false },
+	{ id: 1, text: 'Learn SvelteKit', completed: true },
 	{ id: 2, text: 'Learn TanStack Query', completed: false }
 ]
 
