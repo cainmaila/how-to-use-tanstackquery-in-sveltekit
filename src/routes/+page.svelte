@@ -5,6 +5,10 @@
 	SvelteKit application.
 </p>
 
-<p>
-	Go to the <a href="/todos">Todos Example</a> to see the first example in action.
-</p>
+<h2>範例目錄</h2>
+<ul>
+	<li><a href="/todos">基礎 Todos 範例</a></li>
+	<li><a href="/todos-v2">Todos v2 範例</a></li>
+	<li><a href="/todos-cache-demo">動態 QueryKey 與快取範例</a></li>
+	<li><a href="/polling-demo">輪詢 (Polling) 機制範例</a></li>
+</ul>
