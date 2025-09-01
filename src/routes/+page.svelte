@@ -10,5 +10,6 @@
 	<li><a href="/todos">基礎 Todos 範例</a></li>
 	<li><a href="/todos-v2">Todos v2 範例</a></li>
 	<li><a href="/todos-cache-demo">動態 QueryKey 與快取範例</a></li>
+	<li><a href="/todos-persister">本地緩存範例</a></li>
 	<li><a href="/polling-demo">輪詢 (Polling) 機制範例</a></li>
 </ul>
