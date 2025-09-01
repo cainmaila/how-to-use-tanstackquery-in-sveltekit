@@ -51,6 +51,7 @@ export const queryClient = new QueryClient({
 
 export const persister = createAsyncStoragePersister({
 	storage: browser ? window.localStorage : null
+	//也可以使用 localforage 套件來使用indexDB
 })
 
 export { QueryClientProvider, dehydrate, hydrate } from '@tanstack/svelte-query'
