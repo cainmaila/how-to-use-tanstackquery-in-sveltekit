@@ -67,7 +67,6 @@
 			<small>Data last updated at: {new Date($query$.dataUpdatedAt).toLocaleTimeString()}</small>
 		</p>
 	{/if}
-	<a href="/todos-persister/child">槽狀本地緩存範例</a>
 </main>
 
 <style>
